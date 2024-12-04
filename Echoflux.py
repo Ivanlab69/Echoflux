@@ -1,9 +1,8 @@
 import os
+import subprocess
 import time
 import hashlib
-import scapy.all as scapy
-import subprocess
-import socket
+import nmap
 import sys
 
 # Display logo as ASCII art
@@ -18,163 +17,83 @@ def display_logo():
     """
     print(logo)
 
-# Simulate password checking with hashing
-def check_password(user, password):
-    stored_password_hash = hashlib.sha256("secret_password".encode()).hexdigest()
-    input_password_hash = hashlib.sha256(password.encode()).hexdigest()
-    return stored_password_hash == input_password_hash
+# Help menu
+def display_help():
+    print("""
+    Echoflux OS Help Menu:
+    1. Open Lynx Browser
+    2. Open Terminal Shell
+    3. Run Nmap Scan
+    4. Exit
 
-# Brute force logic
-def brute_force_attack(user, wordlist):
-    if not os.path.exists(wordlist):
-        print(f"Error: The wordlist file '{wordlist}' does not exist.")
-        return
+    Type the option number to select a tool or 'exit' to quit.
+    """)
 
-    print(f"Starting brute force attack on user: {user}...\n")
+# Open Lynx Browser
+def start_lynx():
+    print("Starting Lynx browser...")
+    url = input("Enter URL to visit: ")
+    os.system(f"lynx {url}")
 
-    with open(wordlist, 'r', encoding='utf-8') as file:
-        passwords = file.readlines()
+# Open Terminal Shell
+def start_shell():
+    print("Opening shell terminal...")
+    os.system("bash")  # Opens the standard bash shell
 
-    passwords = [password.strip() for password in passwords]
+# Run Nmap Scan
+def run_nmap():
+    print("Starting Nmap scan...")
+    target = input("Enter the IP address or hostname for Nmap scan: ")
+    scanner = nmap.PortScanner()
+    print(f"Scanning {target}...")
+    scanner.scan(target, '1-1024')  # Scans ports 1-1024
+    print(scanner.all_hosts())
+    for host in scanner.all_hosts():
+        print(f"Host: {host}")
+        print(f"State: {scanner[host].state()}")
+        for protocol in scanner[host].all_protocols():
+            print(f"Protocol: {protocol}")
+            lport = scanner[host][protocol].keys()
+            for port in lport:
+                print(f"Port: {port}, State: {scanner[host][protocol][port]['state']}")
+    print("Scan completed.")
 
-    for count, password in enumerate(passwords, start=1):
-        print(f"Attempt {count}: Trying password '{password}'...")
-        if check_password(user, password):
-            print(f"\n[+] Success: Password found for user '{user}': {password}")
-            return
-        else:
-            print(f"[-] Failed: '{password}' is incorrect.")
-        time.sleep(0.5)
-
-    print(f"\n[-] Brute force failed: No password from the wordlist matched for user '{user}'.")
-
-# Packet analyzer using Scapy
-def packet_analyzer():
-    print("\nStarting Packet Analyzer...\n")
-    print("Press Ctrl+C to stop the analyzer.")
-
-    # Sniffing packets using Scapy
-    scapy.sniff(prn=lambda x: x.show(), store=0, count=10)  # Capture 10 packets and display details
-
-# Metasploit integration (execute Metasploit commands)
-def metasploit_interface():
-    print("\nMetasploit Interface")
-    print("Starting Metasploit...")
-
+# tmux-like interface with multiple windows
+def open_tmux():
+    print("Opening tmux-like terminal...")
     while True:
-        msf_command = input("Metasploit (msf)> ")
-
-        if msf_command.lower() == "exit":
-            break
-        else:
-            # You can use os.system to run Metasploit commands
-            os.system(f"msfconsole -q -x \"{msf_command}\"")
-
-# Denial of Service (DoS) attack
-def dos_attack(target_ip, target_port, duration=10):
-    print(f"\nStarting Denial of Service (DoS) attack on {target_ip}:{target_port} for {duration} seconds...\n")
-    start_time = time.time()
-
-    while time.time() - start_time < duration:
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((target_ip, target_port))
-            s.send(b"GET / HTTP/1.1\r\n")
-            s.close()
-        except Exception as e:
-            print(f"Error: {e}")
-            break
-    print(f"\n[+] DoS attack completed against {target_ip}:{target_port}")
-
-# Admin Tools
-def admin_tools():
-    while True:
-        print("\nAdmin Tools - Echoflux OS")
-        print("1. Brute Force Attack")
-        print("2. Packet Analyzer")
-        print("3. Metasploit Interface")
-        print("4. Denial of Service (DoS) Attack")
-        print("5. Back to Main Menu")
-
-        choice = input("\nChoose an option: ")
-
-        if choice == "1":
-            username = input("Enter the target username: ")
-            wordlist = input("Enter the path to the password wordlist file: ")
-            brute_force_attack(username, wordlist)
-        elif choice == "2":
-            packet_analyzer()
-        elif choice == "3":
-            metasploit_interface()
-        elif choice == "4":
-            target_ip = input("Enter the target IP address: ")
-            target_port = int(input("Enter the target port: "))
-            duration = int(input("Enter attack duration in seconds: "))
-            dos_attack(target_ip, target_port, duration)
-        elif choice == "5":
-            break
-        else:
-            print("Invalid choice, please try again.")
-
-# Menu
-def main_menu():
-    while True:
-        display_logo()  # Display logo each time the menu appears
-        print("1. Calculator")
-        print("2. Text Editor")
-        print("3. Browser")
-        print("4. List Directory")
-        print("5. Echo Message")
-        print("6. Run File")
-        print("7. Admin Tools")
-        print("8. Exit")
-        
-        choice = input("\nChoose an option: ")
-
-        if choice == "1":
-            calculator()
-        elif choice == "2":
-            text_editor()
-        elif choice == "3":
-            browser()
-        elif choice == "4":
-            list_directory()
-        elif choice == "5":
-            echo_message()
-        elif choice == "6":
-            run_file()
-        elif choice == "7":
-            admin_tools()
-        elif choice == "8":
+        display_help()
+        option = input("Select an option: ")
+        if option == '1':
+            start_lynx()
+        elif option == '2':
+            start_shell()
+        elif option == '3':
+            run_nmap()
+        elif option == '4':
             print("Exiting Echoflux OS...")
             break
         else:
-            print("Invalid choice, please try again.")
+            print("Invalid option. Type 'help' for options.")
+        time.sleep(1)
 
-# Placeholder functions for other menu options
-def calculator():
-    print("Simple Calculator (not implemented yet)")
+# Main entry function
+def main():
+    os.system('clear')  # Clears the terminal screen
+    display_logo()
 
-def text_editor():
-    print("Text Editor (not implemented yet)")
+    while True:
+        command = input("Echoflux OS> ")
+        if command == 'help':
+            display_help()
+        elif command == 'start':
+            open_tmux()
+        elif command == 'exit':
+            print("Exiting Echoflux OS...")
+            break
+        else:
+            print("Invalid command. Type 'help' for options.")
 
-def browser():
-    print("Browser (not implemented yet)")
-
-def list_directory():
-    print("Listing Directory (not implemented yet)")
-
-def echo_message():
-    message = input("Enter message to echo: ")
-    print(message)
-
-def run_file():
-    file_name = input("Enter the file name to run: ")
-    if os.path.exists(file_name):
-        os.system(f"python {file_name}")
-    else:
-        print(f"Error: File '{file_name}' not found.")
-
-# Run the OS
 if __name__ == "__main__":
-    main_menu()
+    main()
+
