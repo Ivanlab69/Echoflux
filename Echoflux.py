@@ -34,7 +34,8 @@ def display_main_menu(stdscr):
     
     current_option = 0
     while True:
-        stdscr.clear()  # Clear the screen
+        # Only clear and refresh the screen when needed
+        stdscr.clear()  # Clear the screen once
         display_logo(stdscr)  # Display logo
 
         # Display menu options
@@ -44,7 +45,7 @@ def display_main_menu(stdscr):
             else:
                 stdscr.addstr(f"  {option}\n")
         
-        stdscr.refresh()
+        stdscr.refresh()  # Refresh only once
 
         key = stdscr.getch()  # Get key input
         if key == curses.KEY_DOWN:
@@ -206,23 +207,16 @@ def play_snake_game(stdscr):
 
         window.addch(snake[0][0], snake[0][1], curses.ACS_CKBOARD)
 
-        # Check for collision with wall or self
-        if (snake[0][0] in [0, height] or 
-            snake[0][1] in [0, width] or 
-            snake[0] in snake[1:]):
+        if snake[0] in snake[1:] or \
+           snake[0][0] == 0 or snake[0][0] == height-1 or \
+           snake[0][1] == 0 or snake[0][1] == width-1:
             curses.endwin()
             quit()
-    
-    curses.endwin()
 
-# Main entry function
+# Main program loop
 def main(stdscr):
-    curses.curs_set(0)  # Hide cursor
-    stdscr.nodelay(1)  # Make getch non-blocking
-    stdscr.timeout(100)  # Set timeout for screen updates
+    display_main_menu(stdscr)
 
-    while True:
-        display_main_menu(stdscr)
+# Start the program
+curses.wrapper(main)
 
-if __name__ == "__main__":
-    curses.wrapper(main)
