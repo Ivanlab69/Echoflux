@@ -2,7 +2,6 @@ import os
 import subprocess
 import time
 import hashlib
-import nmap
 import curses
 import random
 
@@ -98,8 +97,7 @@ def display_logo(stdscr):
 def display_main_menu(stdscr):
     options = [
         "1. Open Lynx Browser",
-        "2. Open Terminal Shell (Wine CMD)",
-        "3. Run Nmap Scan",
+        "2. Open Terminal Shell (Wine CMD)"
         "4. Brute Force Password",
         "5. Play Snake Game",
         "6. Open File Explorer",
@@ -154,20 +152,6 @@ def start_shell():
     print("Opening Wine cmd terminal...")
     os.system("wine cmd")  # Launches Wine's Command Prompt
 
-# Run Nmap Scan
-def run_nmap():
-    print("Starting Nmap scan...")
-    target = input("Enter the IP address or hostname for Nmap scan: ")
-    scanner = nmap.PortScanner()
-    print(f"Scanning {target}...")
-    scanner.scan(target, '1-1024')
-    for host in scanner.all_hosts():
-        print(f"Host: {host} ({scanner[host].hostname()})")
-        print(f"State: {scanner[host].state()}")
-        for protocol in scanner[host].all_protocols():
-            ports = scanner[host][protocol].keys()
-            for port in ports:
-                print(f"Port: {port}, State: {scanner[host][protocol][port]['state']}")
 
 # Brute Force Password (educational purposes only)
 def brute_force_attack():
