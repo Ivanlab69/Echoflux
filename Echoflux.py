@@ -130,7 +130,6 @@ def main():
         elif choice == "4":
             filename = input("Enter filename: ")
             file_hasher(filename)
-        elif choice == "5":
           
         else:
             print("Invalid option!")
