@@ -1,6 +1,7 @@
 import socket
 import platform
 import hashlib
+import chess
 
 def banner():
     print(r"""
