@@ -105,6 +105,26 @@ def file_hasher(filename):
     except FileNotFoundError:
         print("File not found!")
 
+def chess_game():
+    board = chess.Board()
+
+    # List all legal moves from the starting position
+    print(list(board.legal_moves))
+
+    # Check if the move "a8a1" is legal
+    print(chess.Move.from_uci("a8a1") in board.legal_moves)
+
+    # Play a series of moves
+    moves = ["e4", "e5", "Qh5", "Nc6", "Bc4", "Nf6", "Qxf7"]
+    for move in moves:
+        board.push_san(move)
+
+    # Check if the position is checkmate
+    print(board.is_checkmate())
+
+    # Print the final board state
+    print(board)
+
 def main():
     banner()
     while True:
@@ -112,10 +132,11 @@ def main():
         print("2. System Info")
         print("3. Caesar Cipher")
         print("4. File Hasher")
-        print("5. Exit")
-        
+        print("5. Chess Game")
+        print("6. Exit")
+
         choice = input("Select an option: ")
-        
+
         if choice == "1":
             host = input("Enter host (e.g., 127.0.0.1): ")
             port = int(input("Enter port: "))
@@ -130,9 +151,10 @@ def main():
             filename = input("Enter filename: ")
             file_hasher(filename)
         elif choice == "5":
+            chess_game()
+        elif choice == "6":
             break
         else:
             print("Invalid option!")
-
 if __name__ == "__main__":
     main()
